@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login & Game</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f3f4f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-image: url('https://example.com/naruto-background.jpg');
+      background-size: cover;
+      color: white;
+      text-align: center;
+      flex-direction: column;
+    }
+    .login-box, .menu {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      width: 300px;
+    }
+    .input-field {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: none;
+    }
+    .btn {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #45a049;
+    }
+    h1 {
+      font-size: 32px;
+    }
+    /* Style untuk tombol penggerak PS */
+    .controller {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .controller div {
+      display: flex;
+      justify-content: center;
+      width: 150px;
+    }
+    .controller button {
+      width: 60px;
+      height: 60px;
+      font-size: 20px;
+      border-radius: 50%;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .controller button:hover {
+      background-color: #45a049;
+    }
+    .controller div.row {
+      justify-content: space-between;
+      width: 180px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-box">
+    <h1>Login Pengguna</h1>
+    <input type="text" id="username" class="input-field" placeholder="Username" required>
+    <input type="password" id="password" class="input-field" placeholder="Password" required>
+    <button class="btn" onclick="loginUser()">Masuk</button>
+    <div id="loginError" style="color:red; margin-top: 10px;"></div>
+  </div>
+
+  <div class="menu" id="gameMenu" style="display: none;">
+    <h1>Menu Utama</h1>
+    <button class="btn" onclick="selectGame()">Pilih Game</button>
+    <button class="btn" onclick="monitorActivity()">Monitor Aktivitas</button>
+    <div id="supportAdmin" style="margin-top: 20px;">
+      <button class="btn" onclick="contactAdmin()">Support Admin</button>
+    </div>
+  </div>
+
+  <div class="menu" id="gameSelection" style="display: none;">
+    <h1>Pilih Game</h1>
+    <button class="btn" onclick="startSnakeGame()">Game Ular Makan Buah</button>
+  </div>
+
+  <div id="snakeGameContainer" style="display: none;">
+    <h1>Game Ular Makan Buah</h1>
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
+    <div class="controller">
+      <div>
+        <button onclick="moveSnake('UP')">↑</button>
+      </div>
+      <div class="row">
+        <button onclick="moveSnake('LEFT')">←</button>
+        <button onclick="moveSnake('DOWN')">↓</button>
+        <button onclick="moveSnake('RIGHT')">→</button>
+      </div>
+      <div class="row">
+        <button class="btn" onclick="resetGame()">Reset Game</button>
+        <button class="btn" onclick="exitToMainMenu()">Keluar ke Menu Utama</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simulasi data pengguna
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+
+    function loginUser() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const user = users.find(u => u.username === username && u.password === password);
+
+      if (user) {
+        if (user.blocked) {
+          document.getElementById('loginError').innerText = 'Akun Anda diblokir!';
+        } else {
+          alert('Login sukses, selamat bermain!');
+          document.querySelector('.login-box').style.display = 'none';
+          document.getElementById('gameMenu').style.display = 'block';
+        }
+      } else {
+        document.getElementById('loginError').innerText = 'Username atau Password Salah!';
+      }
+    }
+
+    // Pilih game untuk dimainkan
+    function selectGame() {
+      document.getElementById('gameMenu').style.display = 'none';
+      document.getElementById('gameSelection').style.display = 'block';
+    }
+
+    // Mulai Game Ular Makan Buah
+    function startSnakeGame() {
+      document.getElementById('gameSelection').style.display = 'none';
+      document.getElementById('snakeGameContainer').style.display = 'block';
+      startGame();
+    }
+
+    // Game Ular Makan Buah
+    let snakeGame;
+    function startGame() {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      snakeGame = new SnakeGame(ctx);
+      snakeGame.start();
+    }
+
+    function moveSnake(direction) {
+      if (snakeGame) {
+        snakeGame.changeDirection(direction);
+      }
+    }
+
+    // Reset Game
+    function resetGame() {
+      if (snakeGame.gameOver) {
+        snakeGame.reset();
+      }
+    }
+
+    // Keluar ke Menu Utama
+    function exitToMainMenu() {
+      document.getElementById('snakeGameContainer').style.display = 'none';
+      document.getElementById('gameMenu').style.display = 'block';
+    }
+
+    // Support Admin - Menghubungi Admin via WhatsApp
+    function contactAdmin() {
+      window.location.href = "https://wa.me/082320884089?text=Halo%20Admin%2C%20saya%20perlu%20bantuan!";
+    }
+
+    // Monitor Aktivitas
+    function monitorActivity() {
+      const currentUser = document.getElementById('username').value;
+      alert(`${currentUser} sedang menggunakan aplikasi.`);
+    }
+
+    // Snake Game Constructor
+    class SnakeGame {
+      constructor(ctx) {
+        this.ctx = ctx;
+        this.snake = [{ x: 10, y: 10 }];
+        this.direction = 'RIGHT';
+        this.food = this.randomPosition();
+        this.score = 0;
+        this.gameOver = false;
+        this.speed = 200; // Kecepatan ular lebih lambat
+        this.setupControls();
+        this.walls = true; // Menambahkan dinding
+      }
+
+      start() {
+        this.gameLoop();
+      }
+
+      setupControls() {
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowUp' && this.direction !== 'DOWN') {
+            this.direction = 'UP';
+          } else if (e.key === 'ArrowDown' && this.direction !== 'UP') {
+            this.direction = 'DOWN';
+          } else if (e.key === 'ArrowLeft' && this.direction !== 'RIGHT') {
+            this.direction = 'LEFT';
+          } else if (e.key === 'ArrowRight' && this.direction !== 'LEFT') {
+            this.direction = 'RIGHT';
+          }
+        });
+      }
+
+      changeDirection(direction) {
+        this.direction = direction;
+      }
+
+      gameLoop() {
+        if (this.gameOver) return alert('Game Over! Skor: ' + this.score);
+
+        this.moveSnake();
+        this.checkCollision();
+        this.updateCanvas();
+        setTimeout(() => this.gameLoop(), this.speed); // Kecepatan ular diperlambat
+      }
+
+      moveSnake() {
+        const head = { ...this.snake[0] };
+        if (this.direction === 'UP') head.y -= 1;
+        if (this.direction === 'DOWN') head.y += 1;
+        if (this.direction === 'LEFT') head.x -= 1;
+        if (this.direction === 'RIGHT') head.x += 1;
+        this.snake.unshift(head);
+        if (head.x === this.food.x && head.y === this.food.y) {
+          this.food = this.randomPosition();
+          this.score++;
+        } else {
+          this.snake.pop();
+        }
+      }
+
+      checkCollision() {
+        const head = this.snake[0];
+        if (
+          head.x < 0 || head.x >= 30 || head.y < 0 || head.y >= 30 ||
+          this.snake.slice(1).some(s => s.x === head.x && s.y === head.y)
+        ) {
+          this.gameOver = true;
+        }
+      }
+
+      updateCanvas() {
+        this.ctx.clearRect(0, 0, 300, 300);
+        this.ctx.fillStyle = 'green';
+        this.snake.forEach(s => this.ctx.fillRect(s.x * 10, s.y * 10, 10, 10));
+        this.ctx.fillStyle = 'red';
+        this.ctx.fillRect(this.food.x * 10, this.food.y * 10, 10, 10);
+        
+        // Menambahkan dinding hitam
+        this.ctx.strokeStyle = 'black';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(0, 0, 300, 300);
+      }
+
+      randomPosition() {
+        return {
+          x: Math.floor(Math.random() * 30),
+          y: Math.floor(Math.random() * 30),
+        };
+      }
+
+      reset() {
+        this.snake = [{ x: 10, y: 10 }];
+        this.direction = 'RIGHT';
+        this.food = this.randomPosition();
+        this.score = 0;
+        this.gameOver = false;
+      }
+    }
+  </script>
+</body>
+</html>
