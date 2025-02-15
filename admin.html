@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f3f4f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+      background-image: url('https://example.com/naruto-background.jpg');
+      background-size: cover;
+      color: white;
+      text-align: center;
+    }
+    .login-box, .menu {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      width: 300px;
+    }
+    .input-field, .btn {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: none;
+    }
+    .btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-box">
+    <h1>Login Admin</h1>
+    <input type="text" id="adminUsername" class="input-field" placeholder="Username">
+    <input type="password" id="adminPassword" class="input-field" placeholder="Password">
+    <button class="btn" onclick="verifyAdminLogin()">Login</button>
+    <div id="loginError" style="color:red; margin-top: 10px;"></div>
+  </div>
+
+  <div class="menu" id="adminMenu" style="display: none;">
+    <h1>Admin Menu</h1>
+    <button class="btn" onclick="addGame()">Tambah Game</button>
+    <button class="btn" onclick="addUser()">Tambah Pengguna</button>
+    <button class="btn" onclick="deleteUser()">Hapus Pengguna</button>
+    <button class="btn" onclick="blockUser()">Blokir Pengguna</button>
+    <button class="btn" onclick="changeMusic()">Ubah Musik</button>
+    <button class="btn" onclick="monitorActivity()">Monitor Aktivitas</button>
+  </div>
+
+  <script>
+    const adminUsername = 'AZKA';
+    const adminPassword = 'AZKA';
+
+    function verifyAdminLogin() {
+      const username = document.getElementById('adminUsername').value;
+      const password = document.getElementById('adminPassword').value;
+
+      if (username === adminUsername && password === adminPassword) {
+        document.querySelector('.login-box').style.display = 'none';
+        document.getElementById('adminMenu').style.display = 'block';
+      } else {
+        document.getElementById('loginError').innerText = 'Username atau Password salah!';
+      }
+    }
+
+    function addGame() {
+      const gameName = prompt('Masukkan nama game yang ingin ditambahkan');
+      if (gameName) {
+        alert(`${gameName} telah ditambahkan.`);
+      }
+    }
+
+    function addUser() {
+      const newUsername = prompt('Masukkan username pengguna baru');
+      const newPassword = prompt('Masukkan password pengguna baru');
+      if (newUsername && newPassword) {
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        users.push({ username: newUsername, password: newPassword });
+        localStorage.setItem('users', JSON.stringify(users));
+        alert(`Pengguna ${newUsername} telah ditambahkan!`);
+      }
+    }
+
+    function deleteUser() {
+      const usernameToDelete = prompt('Masukkan username yang ingin dihapus');
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      users = users.filter(user => user.username !== usernameToDelete);
+      localStorage.setItem('users', JSON.stringify(users));
+      alert(`Pengguna ${usernameToDelete} telah dihapus!`);
+    }
+
+    function blockUser() {
+      const usernameToBlock = prompt('Masukkan username yang ingin diblokir');
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      const user = users.find(u => u.username === usernameToBlock);
+      if (user) {
+        user.blocked = true;
+        localStorage.setItem('users', JSON.stringify(users));
+        alert(`Pengguna ${usernameToBlock} telah diblokir!`);
+      }
+    }
+
+    function changeMusic() {
+      alert('Fitur ubah musik belum tersedia.');
+    }
+
+    function monitorActivity() {
+      alert('Fitur monitor aktivitas belum tersedia.');
+    }
+  </script>
+
+</body>
+</html>
